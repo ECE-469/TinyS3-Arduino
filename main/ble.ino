@@ -12,13 +12,19 @@
 
 class MyCallbackHandler : public BLECharacteristicCallbacks
 {
-  void onRead(BLECharacteristic *pCharacteristic)
+  void onRead(BLECharacteristic *pCharacteristic, esp_ble_gatts_cb_param_t *param)
   {
+    Serial.println("onRead");
     struct timeval tv;
     gettimeofday(&tv, nullptr);
     std::ostringstream os;
     os << "Time: " << tv.tv_sec;
     pCharacteristic->setValue(os.str());
+  }
+
+  void onSubscribe(BLECharacteristic *pCharacteristic, esp_ble_gatts_cb_param_t *param)
+  {
+    Serial.println("Client subscribed to notifications");
   }
 };
 
@@ -36,6 +42,16 @@ void ble_init()
       BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
   pCharacteristic->setValue("Elapsed Time");
   pCharacteristic->setCallbacks(myCallbackHandler);
+  BLEUUID cccdUUID(BLEUUID((uint16_t)0x2902)); // Standard UUID for CCCD
+
+  // Create the CCCD descriptor
+  BLEDescriptor *pDescriptor = new BLEDescriptor(cccdUUID);
+
+  // Set the properties and permissions for the CCCD
+  pDescriptor->setAccessPermissions(ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE);
+
+  // Add the CCCD to the characteristic
+  pCharacteristic->addDescriptor(pDescriptor);
   pService->start();
   BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
   pAdvertising->addServiceUUID(SERVICE_UUID);
@@ -46,3 +62,7 @@ void ble_init()
   Serial.println("Characteristic defined! Now you can read it in your phone!");
 }
 
+BLECharacteristic *get_co_characteristic()
+{
+  return pCharacteristic;
+}
