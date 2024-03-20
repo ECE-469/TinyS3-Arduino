@@ -1,10 +1,11 @@
 {
     "arduino.clearOutputOnBuild": true,
     "arduino.useArduinoCli": true,
-    "arduino.commandPath": "C:\\Program Files\\Arduino CLI\\arduino-cli.exe",
+    "arduino.commandPath": "",
     "arduino.enableUSBDetection": true,
     "workbench.colorTheme": "One Dark Pro Darker",
     "cmake.configureOnOpen": false,
     "cmake.options.statusBarVisibility": "icon",
-    "C_Cpp.default.compilerPath": "C:\\code\\compiler\\"
+    "C_Cpp.default.compilerPath": "C:\\code\\compiler\\",
+    "arduino.path": "C:\\Program Files\\Arduino"
 }
