@@ -1,8 +1,7 @@
-#include <BLEDevice.h>
-#include <BLEUtils.h>
-#include <BLEServer.h>
+#include "bluetooth/init.cpp"
+#include "sensors/CO.cpp"
 
-BLECharacteristic *co_char = NULL;
+BLECharacteristic *CO_characteristic = NULL;
 
 void setup()
 {
@@ -10,15 +9,24 @@ void setup()
   Serial.println("Starting BLE work!");
 
   ble_init();
-  co_char = get_co_characteristic();
-}
+  CO_characteristic = get_CO_characteristic();
 
-int i = 0;
+  init_CO();
+}
 
 void loop()
 {
-  delay(2000);
-  i++;
-  co_char->setValue(i);
-  co_char->notify();
+  float coConcentration = get_CO_concentration();
+  Serial.println("CO Concentration: " + String(coConcentration) + " ppm");
+
+  // Convert the float to a byte array
+  byte coConcentrationBytes[sizeof(float)];
+  memcpy(coConcentrationBytes, &coConcentration, sizeof(float));
+
+  Serial.println("CO Concentration Bytes: " + String(coConcentrationBytes[0]) + " " + String(coConcentrationBytes[1]) + " " + String(coConcentrationBytes[2]) + " " + String(coConcentrationBytes[3]));
+
+  // Set the characteristic value and notify
+  CO_characteristic->setValue(coConcentrationBytes, sizeof(coConcentrationBytes));
+  CO_characteristic->notify();
+  delay(1000);
 }

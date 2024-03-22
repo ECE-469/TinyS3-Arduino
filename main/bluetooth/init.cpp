@@ -28,7 +28,23 @@ class MyCallbackHandler : public BLECharacteristicCallbacks
   }
 };
 
+class MyServerCallbacks : public BLEServerCallbacks
+{
+  void onConnect(BLEServer *pServer)
+  {
+    Serial.println("Client connected");
+  };
+
+  void onDisconnect(BLEServer *pServer)
+  {
+    Serial.println("Client disconnected");
+    delay(100); // give the client time to get the last notification
+    BLEDevice::startAdvertising();
+  };
+};
+
 MyCallbackHandler *myCallbackHandler = new MyCallbackHandler();
+MyServerCallbacks *myServerCallbacks = new MyServerCallbacks();
 BLECharacteristic *pCharacteristic;
 
 void ble_init()
@@ -36,6 +52,7 @@ void ble_init()
 
   BLEDevice::init(DEVICE_NAME);
   BLEServer *pServer = BLEDevice::createServer();
+  pServer->setCallbacks(myServerCallbacks);
   BLEService *pService = pServer->createService(SERVICE_UUID);
   pCharacteristic = pService->createCharacteristic(
       CHARACTERISTIC_CO_UUID,
@@ -62,7 +79,7 @@ void ble_init()
   Serial.println("Characteristic defined! Now you can read it in your phone!");
 }
 
-BLECharacteristic *get_co_characteristic()
+BLECharacteristic *get_CO_characteristic()
 {
   return pCharacteristic;
 }
