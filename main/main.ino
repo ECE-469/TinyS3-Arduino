@@ -1,5 +1,6 @@
 #include "bluetooth/init.cpp"
 #include "sensors/CO.cpp"
+#include "sensors/CO2.cpp"
 
 BLECharacteristic *CO_characteristic = NULL;
 
@@ -12,6 +13,7 @@ void setup()
   CO_characteristic = get_CO_characteristic();
 
   init_CO();
+  // init_CO2();
 }
 
 void loop()
@@ -28,5 +30,7 @@ void loop()
   // Set the characteristic value and notify
   CO_characteristic->setValue(coConcentrationBytes, sizeof(coConcentrationBytes));
   CO_characteristic->notify();
-  delay(1000);
+
+  // test_CO2();
+  delay(10);
 }

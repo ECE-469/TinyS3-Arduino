@@ -222,6 +222,8 @@
                 "C:\\Users\\nolan\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.11\\libraries\\BLE\\src",
                 "C:\\Users\\nolan\\OneDrive\\Documents\\Arduino\\libraries\\DFRobot_MultiGasSensor",
                 "C:\\Users\\nolan\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.11\\libraries\\Wire\\src",
+                "C:\\Users\\nolan\\OneDrive\\Documents\\Arduino\\libraries\\Sensirion_I2C_SCD4x\\src",
+                "C:\\Users\\nolan\\OneDrive\\Documents\\Arduino\\libraries\\Sensirion_Core\\src",
                 "c:\\users\\nolan\\appdata\\local\\arduino15\\packages\\esp32\\tools\\xtensa-esp32s3-elf-gcc\\esp-2021r2-patch5-8.4.0\\xtensa-esp32s3-elf\\include\\c++\\8.4.0",
                 "c:\\users\\nolan\\appdata\\local\\arduino15\\packages\\esp32\\tools\\xtensa-esp32s3-elf-gcc\\esp-2021r2-patch5-8.4.0\\xtensa-esp32s3-elf\\include\\c++\\8.4.0\\xtensa-esp32s3-elf",
                 "c:\\users\\nolan\\appdata\\local\\arduino15\\packages\\esp32\\tools\\xtensa-esp32s3-elf-gcc\\esp-2021r2-patch5-8.4.0\\xtensa-esp32s3-elf\\include\\c++\\8.4.0\\backward",
