@@ -1,36 +1,30 @@
 #include "bluetooth/init.cpp"
 #include "sensors/CO.cpp"
 #include "sensors/CO2.cpp"
+#include <vector>
+#include <memory>
 
 BLECharacteristic *CO_characteristic = NULL;
+
+std::vector<std::unique_ptr<GasSensor>> sensors;
 
 void setup()
 {
   Serial.begin(115200);
   Serial.println("Starting BLE work!");
 
-  ble_init();
-  CO_characteristic = get_CO_characteristic();
+  BLE *ble = new BLE();
 
-  init_CO();
-  // init_CO2();
+  sensors.push_back(std::make_unique<COSensor>(std::move(ble->get_CO_characteristic())));
+  sensors.push_back(std::make_unique<CO2Sensor>(std::move(ble->get_CO2_characteristic())));
 }
 
 void loop()
 {
-  float coConcentration = get_CO_concentration();
-  Serial.println("CO Concentration: " + String(coConcentration) + " ppm");
 
-  // Convert the float to a byte array
-  byte coConcentrationBytes[sizeof(float)];
-  memcpy(coConcentrationBytes, &coConcentration, sizeof(float));
-
-  Serial.println("CO Concentration Bytes: " + String(coConcentrationBytes[0]) + " " + String(coConcentrationBytes[1]) + " " + String(coConcentrationBytes[2]) + " " + String(coConcentrationBytes[3]));
-
-  // Set the characteristic value and notify
-  CO_characteristic->setValue(coConcentrationBytes, sizeof(coConcentrationBytes));
-  CO_characteristic->notify();
-
-  // test_CO2();
-  delay(10);
+  for (const auto &sensor : sensors)
+  {
+    sensor->readAndSendData();
+  }
+  delay(500);
 }

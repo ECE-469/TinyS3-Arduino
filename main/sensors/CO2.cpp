@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <SensirionI2CScd4x.h>
 #include <Wire.h>
+#include "../GasSensor.cpp"
 
 SensirionI2CScd4x scd4x;
 
@@ -119,3 +120,90 @@ void test_CO2()
     Serial.println(humidity);
   }
 }
+
+class CO2Sensor : public GasSensor
+{
+public:
+  CO2Sensor(std::unique_ptr<BLECharacteristic> &bleCharacteristic)
+      : GasSensor(bleCharacteristic)
+  {
+    init_CO2();
+  }
+
+  std::string getName() const override
+  {
+    return "CO2";
+  }
+
+  std::string getUnits() const override
+  {
+    return "ppm";
+  }
+
+  float getGasConcentration() override
+  {
+    safeRead();
+    return co2;
+  }
+
+  float getTemperature() override
+  {
+    safeRead();
+    return temperature;
+  }
+
+  float getHumidity() override
+  {
+    safeRead();
+    return humidity;
+  }
+
+private:
+  uint16_t error;
+  uint16_t co2;
+  float temperature;
+  float humidity;
+
+  bool checkDataReady() const
+  {
+    char errorMessage[256];
+    bool isDataReady = false;
+    uint16_t e = scd4x.getDataReadyFlag(isDataReady);
+    if (e)
+    {
+      Serial.print("Error trying to execute getDataReadyFlag(): ");
+      errorToString(e, errorMessage, 256);
+      Serial.println(errorMessage);
+      return false;
+    }
+    return isDataReady;
+  }
+
+  void safeRead()
+  {
+    char errorMessage[256];
+    uint16_t old_co2 = co2;
+    float old_temperature = temperature;
+    float old_humidity = humidity;
+    if (checkDataReady())
+    {
+      error = scd4x.readMeasurement(co2, temperature, humidity);
+      if (error)
+      {
+        Serial.print("Error trying to execute readMeasurement(): ");
+        errorToString(error, errorMessage, 256);
+        Serial.println(errorMessage);
+        co2 = old_co2;
+        temperature = old_temperature;
+        humidity = old_humidity;
+      }
+      else if (co2 == 0)
+      {
+        Serial.println("Invalid sample detected, skipping.");
+        co2 = old_co2;
+        temperature = old_temperature;
+        humidity = old_humidity;
+      }
+    }
+  }
+};

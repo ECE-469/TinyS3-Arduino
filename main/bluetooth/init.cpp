@@ -8,27 +8,13 @@
 #define SERVICE_UUID "f3641400-00b0-4240-ba50-05ca45bf8abc"
 #define CHARACTERISTIC_UUID "f3641401-00b0-4240-ba50-05ca45bf8abc"
 #define CHARACTERISTIC_CO_UUID "f3641403-00b0-4240-ba50-05ca45bf8abc"
+#define CHARACTERISTIC_CO2_UUID "f3641404-00b0-4240-ba50-05ca45bf8abc"
 #define DEVICE_NAME "TinyS3 Arduino"
 
-class MyCallbackHandler : public BLECharacteristicCallbacks
-{
-  void onRead(BLECharacteristic *pCharacteristic, esp_ble_gatts_cb_param_t *param)
-  {
-    Serial.println("onRead");
-    struct timeval tv;
-    gettimeofday(&tv, nullptr);
-    std::ostringstream os;
-    os << "Time: " << tv.tv_sec;
-    pCharacteristic->setValue(os.str());
-  }
+// TODO: Fix this terrible implementation
+// ideas: use a map where the sensor name is the key and the characteristic is the value
 
-  void onSubscribe(BLECharacteristic *pCharacteristic, esp_ble_gatts_cb_param_t *param)
-  {
-    Serial.println("Client subscribed to notifications");
-  }
-};
-
-class MyServerCallbacks : public BLEServerCallbacks
+class CustomServerCallbacks : public BLEServerCallbacks
 {
   void onConnect(BLEServer *pServer)
   {
@@ -43,43 +29,58 @@ class MyServerCallbacks : public BLEServerCallbacks
   };
 };
 
-MyCallbackHandler *myCallbackHandler = new MyCallbackHandler();
-MyServerCallbacks *myServerCallbacks = new MyServerCallbacks();
-BLECharacteristic *pCharacteristic;
-
-void ble_init()
+class BLE
 {
+public:
+  BLE()
+  {
+    CustomServerCallbacks *myServerCallbacks = new CustomServerCallbacks();
+    BLEDevice::init(DEVICE_NAME);
+    BLEServer *pServer = BLEDevice::createServer();
+    pServer->setCallbacks(myServerCallbacks);
+    BLEService *pService = pServer->createService(SERVICE_UUID);
+    _init_characteristics(pService);
+    pService->start();
+    _init_advertising();
+  }
 
-  BLEDevice::init(DEVICE_NAME);
-  BLEServer *pServer = BLEDevice::createServer();
-  pServer->setCallbacks(myServerCallbacks);
-  BLEService *pService = pServer->createService(SERVICE_UUID);
-  pCharacteristic = pService->createCharacteristic(
-      CHARACTERISTIC_CO_UUID,
-      BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
-  pCharacteristic->setValue("Elapsed Time");
-  pCharacteristic->setCallbacks(myCallbackHandler);
-  BLEUUID cccdUUID(BLEUUID((uint16_t)0x2902)); // Standard UUID for CCCD
+  BLECharacteristic *get_CO_characteristic()
+  {
+    return coCharacteristic;
+  }
 
-  // Create the CCCD descriptor
-  BLEDescriptor *pDescriptor = new BLEDescriptor(cccdUUID);
+  BLECharacteristic *get_CO2_characteristic()
+  {
+    return co2Characteristic;
+  }
 
-  // Set the properties and permissions for the CCCD
-  pDescriptor->setAccessPermissions(ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE);
+private:
+  BLECharacteristic *coCharacteristic;
+  BLECharacteristic *co2Characteristic;
 
-  // Add the CCCD to the characteristic
-  pCharacteristic->addDescriptor(pDescriptor);
-  pService->start();
-  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
-  pAdvertising->addServiceUUID(SERVICE_UUID);
-  pAdvertising->setScanResponse(true);
-  pAdvertising->setMinPreferred(0x06);
-  pAdvertising->setMinPreferred(0x12);
-  BLEDevice::startAdvertising();
-  Serial.println("Characteristic defined! Now you can read it in your phone!");
-}
+  void _init_characteristics(BLEService *pService)
+  {
+    coCharacteristic = create_characteristic(CHARACTERISTIC_CO_UUID, pService);
+    co2Characteristic = create_characteristic(CHARACTERISTIC_CO2_UUID, pService);
+  }
 
-BLECharacteristic *get_CO_characteristic()
-{
-  return pCharacteristic;
-}
+  void _init_advertising()
+  {
+    BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+    pAdvertising->addServiceUUID(SERVICE_UUID);
+    pAdvertising->setScanResponse(true);
+    pAdvertising->setMinPreferred(0x06);
+    pAdvertising->setMinPreferred(0x12);
+    BLEDevice::startAdvertising();
+  }
+
+  BLECharacteristic *create_characteristic(const char *uuid, BLEService *pService)
+  {
+    BLECharacteristic *characteristic = pService->createCharacteristic(uuid, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
+    BLEUUID cccdUUID(BLEUUID((uint16_t)0x2902)); // Standard UUID for CCCD
+    BLEDescriptor *pDescriptor = new BLEDescriptor(cccdUUID);
+    pDescriptor->setAccessPermissions(ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE);
+    characteristic->addDescriptor(pDescriptor);
+    return characteristic;
+  }
+};

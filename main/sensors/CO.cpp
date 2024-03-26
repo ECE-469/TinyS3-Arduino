@@ -12,14 +12,10 @@
   * @n Experimental phenomenon: Print all data via serial port
 */
 #include <DFRobot_MultiGasSensor.h>
+#include "../GasSensor.cpp"
 
-// Turn on by default, using I2C communication at the time, switch to serial port communication after turning off
-#define I2C_COMMUNICATION
-
-#ifdef I2C_COMMUNICATION
 #define I2C_ADDRESS 0x74
 DFRobot_GAS_I2C gas(&Wire, I2C_ADDRESS);
-#endif
 
 void init_CO()
 {
@@ -36,7 +32,27 @@ void init_CO()
   gas.setTempCompensation(gas.OFF);
 }
 
-float get_CO_concentration()
+class COSensor : public GasSensor
 {
-  return gas.readGasConcentrationPPM();
-}
+public:
+  COSensor(std::unique_ptr<BLECharacteristic> &bleCharacteristic)
+      : GasSensor(bleCharacteristic)
+  {
+    init_CO();
+  }
+
+  std::string getName() const override
+  {
+    return "CO";
+  }
+
+  std::string getUnits() const override
+  {
+    return "ppm";
+  }
+
+  float getGasConcentration() const override
+  {
+    return gas.readGasConcentrationPPM();
+  }
+};
