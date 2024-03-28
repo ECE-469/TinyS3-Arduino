@@ -2,11 +2,6 @@
 
 GasSensor::GasSensor(BLE &ble)
 {
-  // if (!bleCharacteristic_)
-  // {
-  //   throw std::invalid_argument("BLECharacteristic must be provided");
-  // }
-  delay(5000);
   Serial.println("GasSensor constructor");
   ble_ = std::unique_ptr<BLE>(new BLE(ble));
 }

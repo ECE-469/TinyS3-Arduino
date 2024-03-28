@@ -73,10 +73,7 @@ void init_CO2()
 CO2Sensor::CO2Sensor(BLE &ble)
     : GasSensor(ble)
 {
-  Serial.println("CO2Sensor constructor");
-  delay(5000);
   init_CO2();
-  Serial.println("CO2Sensor constructor end");
 }
 
 std::string CO2Sensor::getName() const
