@@ -27,11 +27,11 @@ public:
   virtual float getHumidity();
 
 protected:
-  // Pointer to the BLECharacteristic
-  std::unique_ptr<BLECharacteristic> bleCharacteristic_;
+  // Pointer to the BLE Class
+  std::unique_ptr<BLE> ble_;
 
 private:
   void sendConcentrationViaBLE(const float concentration);
 };
 
-#endif // GASSENSOR_H
+#endif

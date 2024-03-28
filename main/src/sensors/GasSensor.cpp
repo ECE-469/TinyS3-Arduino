@@ -2,12 +2,13 @@
 
 GasSensor::GasSensor(BLE &ble)
 {
-  if (!bleCharacteristic_)
-  {
-    throw std::invalid_argument("BLECharacteristic must be provided");
-  }
-  BLECharacteristic *characteristic = ble.get_characteristic(getName());
-  bleCharacteristic_ = std::unique_ptr<BLECharacteristic>(new BLECharacteristic(*characteristic));
+  // if (!bleCharacteristic_)
+  // {
+  //   throw std::invalid_argument("BLECharacteristic must be provided");
+  // }
+  delay(5000);
+  Serial.println("GasSensor constructor");
+  ble_ = std::unique_ptr<BLE>(new BLE(ble));
 }
 
 GasSensor::~GasSensor() {}
@@ -30,8 +31,11 @@ void GasSensor::sendConcentrationViaBLE(const float concentration)
   memcpy(bytes, &concentration, sizeof(float));
 
   // Set the characteristic value and notify
-  bleCharacteristic_->setValue(bytes, sizeof(bytes));
-  bleCharacteristic_->notify();
+  std::string name = getName();
+  Serial.println(name.c_str());
+  BLECharacteristic *characteristic = ble_->get_characteristic(name);
+  characteristic->setValue(bytes, sizeof(bytes));
+  characteristic->notify();
 }
 
 float GasSensor::getTemperature()

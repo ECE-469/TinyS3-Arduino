@@ -70,58 +70,13 @@ void init_CO2()
   Serial.println("Waiting for first measurement... (5 sec)");
 }
 
-void test_CO2()
-{
-  uint16_t error;
-  char errorMessage[256];
-
-  delay(100);
-
-  // Read Measurement
-  uint16_t co2 = 0;
-  float temperature = 0.0f;
-  float humidity = 0.0f;
-  bool isDataReady = false;
-  error = scd4x.getDataReadyFlag(isDataReady);
-  if (error)
-  {
-    Serial.print("Error trying to execute getDataReadyFlag(): ");
-    errorToString(error, errorMessage, 256);
-    Serial.println(errorMessage);
-    return;
-  }
-  if (!isDataReady)
-  {
-    return;
-  }
-  error = scd4x.readMeasurement(co2, temperature, humidity);
-  if (error)
-  {
-    Serial.print("Error trying to execute readMeasurement(): ");
-    errorToString(error, errorMessage, 256);
-    Serial.println(errorMessage);
-  }
-  else if (co2 == 0)
-  {
-    Serial.println("Invalid sample detected, skipping.");
-  }
-  else
-  {
-    Serial.print("Co2:");
-    Serial.print(co2);
-    Serial.print("\t");
-    Serial.print("Temperature:");
-    Serial.print(temperature);
-    Serial.print("\t");
-    Serial.print("Humidity:");
-    Serial.println(humidity);
-  }
-}
-
 CO2Sensor::CO2Sensor(BLE &ble)
     : GasSensor(ble)
 {
+  Serial.println("CO2Sensor constructor");
+  delay(5000);
   init_CO2();
+  Serial.println("CO2Sensor constructor end");
 }
 
 std::string CO2Sensor::getName() const
