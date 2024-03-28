@@ -1,10 +1,7 @@
-#include "bluetooth/init.cpp"
-#include "sensors/CO.cpp"
-#include "sensors/CO2.cpp"
+#include "src/sensors/CO2/CO2.h"
+#include "src/sensors/CO/CO.h"
 #include <vector>
 #include <memory>
-
-BLECharacteristic *CO_characteristic = NULL;
 
 std::vector<std::unique_ptr<GasSensor>> sensors;
 
@@ -15,8 +12,8 @@ void setup()
 
   BLE *ble = new BLE();
 
-  sensors.push_back(std::make_unique<COSensor>(std::move(ble->get_CO_characteristic())));
-  sensors.push_back(std::make_unique<CO2Sensor>(std::move(ble->get_CO2_characteristic())));
+  sensors.push_back(std::unique_ptr<COSensor>(new COSensor(*ble)));
+  sensors.push_back(std::unique_ptr<CO2Sensor>(new CO2Sensor(*ble)));
 }
 
 void loop()
@@ -26,5 +23,5 @@ void loop()
   {
     sensor->readAndSendData();
   }
-  delay(500);
+  delay(5000);
 }
