@@ -3,7 +3,8 @@
 std::map<SENSOR_NAME, UUID> sensor_uuid_map = {
     {"CHARACTERISTIC", CHARACTERISTIC_UUID},
     {"CO", CHARACTERISTIC_CO_UUID},
-    {"CO2", CHARACTERISTIC_CO2_UUID}};
+    {"CO2", CHARACTERISTIC_CO2_UUID},
+    {"O3", CHARACTERISTIC_O3_UUID}};
 
 void CustomServerCallbacks::onConnect(BLEServer *pServer)
 {

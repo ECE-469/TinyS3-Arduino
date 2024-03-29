@@ -1,5 +1,4 @@
-#include "src/sensors/CO2/CO2.h"
-#include "src/sensors/CO/CO.h"
+#include "src/sensors/sensors.h"
 #include <vector>
 #include <memory>
 
@@ -18,7 +17,7 @@ void setup()
   BLE *ble = new BLE();
 
   sensors.push_back(make_unique<CO2Sensor>(*ble));
-  sensors.push_back(make_unique<COSensor>(*ble));
+  sensors.push_back(make_unique<O3Sensor>(*ble));
 
   Serial.println("All Sensors Initialized!");
 }
@@ -27,7 +26,7 @@ void loop()
 {
   for (const auto &sensor : sensors)
   {
-    std::string name = sensor->getName().c_str();
+    std::string name = sensor->getName();
     Serial.println("\n");
     Serial.println(name.c_str());
     if (name == "CO2")
