@@ -2,8 +2,8 @@
 #define CO2_H
 
 #include "../GasSensor.h"
+#include "../../lib/carbon-dioxide/SensirionI2CScd4x.h"
 #include <Arduino.h>
-#include <SensirionI2CScd4x.h>
 #include <Wire.h>
 #include <string>
 
@@ -23,14 +23,17 @@ public:
   float getHumidity() override;
 
 private:
+  SensirionI2CScd4x scd4x;
   uint16_t error;
   uint16_t co2;
   float temperature;
   float humidity;
 
-  bool checkDataReady() const;
-
+  bool checkDataReady();
   void safeRead();
+  void init();
+  void printUint16Hex(uint16_t value);
+  void printSerialNumber(uint16_t serial0, uint16_t serial1, uint16_t serial2);
 };
 
 #endif

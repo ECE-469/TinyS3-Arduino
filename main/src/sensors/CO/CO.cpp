@@ -1,4 +1,3 @@
-#include <DFRobot_MultiGasSensor.h>
 #include "CO.h"
 
 #define I2C_ADDRESS 0x74

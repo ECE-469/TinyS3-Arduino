@@ -1,6 +1,7 @@
 #ifndef CO_H
 #define CO_H
 
+#include "../../lib/carbon-monoxide/DFRobot_MultiGasSensor.h"
 #include "../GasSensor.h"
 #include <string>
 
@@ -16,4 +17,4 @@ public:
   float getGasConcentration() override;
 };
 
-#endif // CO_H
+#endif
