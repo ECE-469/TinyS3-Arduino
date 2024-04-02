@@ -8,25 +8,10 @@ VOCNOXSensor::VOCNOXSensor(BLE &ble)
 
 std::string VOCNOXSensor::getName() const
 {
-  return "VOC+NOX";
+  return "SGP41";
 }
 
-std::string VOCNOXSensor::getUnits() const
-{
-  return "ppm";
-}
-
-float VOCNOXSensor::getTemperature()
-{
-  return temp;
-}
-
-float VOCNOXSensor::getHumidity()
-{
-  return humd;
-}
-
-float VOCNOXSensor::getGasConcentration()
+std::map<std::string, SensorData> VOCNOXSensor::getData()
 {
   uint16_t error;
   char errorMessage[256];
@@ -45,13 +30,13 @@ float VOCNOXSensor::getGasConcentration()
   }
   else
   {
-    temp = temperature;
-    humd = humidity;
-    voc = vocIndex;
-    nox = noxIndex;
+    data["VOC"] = SensorData(vocIndex, "ppb");
+    data["NOx"] = SensorData(noxIndex, "ppb");
+    data["Temperature"] = SensorData(temperature, "C");
+    data["Humidity"] = SensorData(humidity, "%");
   }
 
-  return nox;
+  return data;
 }
 
 void VOCNOXSensor::init()
@@ -134,4 +119,8 @@ void VOCNOXSensor::init()
     errorToString(error, errorMessage, 256);
     Serial.println(errorMessage);
   }
+  data["VOC"] = SensorData("ppb");
+  data["NOx"] = SensorData("ppb");
+  data["Temperature"] = SensorData("C");
+  data["Humidity"] = SensorData("%");
 }

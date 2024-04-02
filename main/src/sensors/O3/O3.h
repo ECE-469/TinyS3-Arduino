@@ -16,14 +16,10 @@ public:
   O3Sensor(BLE &ble);
 
   std::string getName() const override;
-
-  std::string getUnits() const override;
-
-  float getGasConcentration() override;
+  std::map<std::string, SensorData> getData() override;
 
 private:
   DFRobot_OzoneSensor Ozone;
-
   void init();
 };
 

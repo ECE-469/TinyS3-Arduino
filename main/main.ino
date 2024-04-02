@@ -37,12 +37,11 @@ void loop()
     std::string name = sensor->getName();
     Serial.print("\n");
     Serial.println(name.c_str());
-    if (name == "CO2" || name == "VOC+NOX")
+    std::map<std::string, SensorData> sensorData = sensor->getData();
+    for (const auto &data : sensorData)
     {
-      Serial.println("Humidity: " + String(sensor->getHumidity()));
-      Serial.println("Temperature: " + String(sensor->getTemperature()));
+      Serial.println(String(data.first.c_str()) + ": " + String(data.second.value) + data.second.units.c_str());
     }
-    Serial.println("Concentration: " + String(sensor->getGasConcentration()) + sensor->getUnits().c_str());
   }
   delay(5000);
 }

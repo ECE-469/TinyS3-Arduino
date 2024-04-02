@@ -29,12 +29,9 @@ std::string COSensor::getName() const
   return "CO";
 }
 
-std::string COSensor::getUnits() const
+std::map<std::string, SensorData> COSensor::getData()
 {
-  return "ppm";
-}
-
-float COSensor::getGasConcentration()
-{
-  return gas.readGasConcentrationPPM();
+  std::map<std::string, SensorData> data;
+  data["CO"] = SensorData(gas.readGasConcentrationPPM(), "ppm");
+  return data;
 }

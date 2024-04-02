@@ -11,10 +11,7 @@ public:
   COSensor(BLE &ble);
 
   std::string getName() const override;
-
-  std::string getUnits() const override;
-
-  float getGasConcentration() override;
+  std::map<std::string, SensorData> getData() override;
 };
 
 #endif

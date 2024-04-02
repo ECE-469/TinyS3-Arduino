@@ -11,23 +11,20 @@ std::string O3Sensor::getName() const
   return "O3";
 }
 
-std::string O3Sensor::getUnits() const
+std::map<std::string, SensorData> O3Sensor::getData()
 {
-  return "ppb";
-}
-
-float O3Sensor::getGasConcentration()
-{
-  return Ozone.readOzoneData(COLLECT_NUMBER);
+  std::map<std::string, SensorData> data;
+  data["O3"] = SensorData(Ozone.readOzoneData(COLLECT_NUMBER), "ppb");
+  return data;
 }
 
 void O3Sensor::init()
 {
   while (!Ozone.begin(Ozone_IICAddress))
   {
-    Serial.println("I2c device number error !");
+    Serial.println("I2c device number error!");
     delay(1000);
   }
-  Serial.println("I2c connect success !");
+  Serial.println("I2c connected!");
   Ozone.setModes(MEASURE_MODE_PASSIVE);
 }

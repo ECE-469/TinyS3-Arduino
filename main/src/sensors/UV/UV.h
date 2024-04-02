@@ -13,10 +13,7 @@ public:
   UVSensor(BLE &ble);
 
   std::string getName() const override;
-
-  std::string getUnits() const override;
-
-  float getGasConcentration() override;
+  std::map<std::string, SensorData> getData() override;
 
 private:
   Adafruit_LTR390 ltr;

@@ -11,27 +11,14 @@ std::string CO2Sensor::getName() const
   return "CO2";
 }
 
-std::string CO2Sensor::getUnits() const
-{
-  return "ppm";
-}
-
-float CO2Sensor::getGasConcentration()
+std::map<std::string, SensorData> CO2Sensor::getData()
 {
   safeRead();
-  return co2;
-}
-
-float CO2Sensor::getTemperature()
-{
-  safeRead();
-  return temperature;
-}
-
-float CO2Sensor::getHumidity()
-{
-  safeRead();
-  return humidity;
+  std::map<std::string, SensorData> data;
+  data["CO2"] = SensorData(co2, "ppm");
+  data["Temperature"] = SensorData(temperature, "°C");
+  data["Humidity"] = SensorData(humidity, "%");
+  return data;
 }
 
 bool CO2Sensor::checkDataReady()
@@ -67,7 +54,7 @@ void CO2Sensor::safeRead()
       temperature = old_temperature;
       humidity = old_humidity;
     }
-    else if (co2 == 0)
+    else if (co2 <= 0)
     {
       Serial.println("Invalid sample detected, skipping.");
       co2 = old_co2;

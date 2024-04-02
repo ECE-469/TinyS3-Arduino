@@ -13,15 +13,15 @@ public:
   PMSensor(BLE &ble);
 
   std::string getName() const override;
-  std::string getUnits() const override;
-  float getGasConcentration() override;
+  std::map<std::string, SensorData> getData() override;
 
 private:
   Adafruit_PM25AQI aqi;
   float pm;
 
-  void
-  init();
+  std::map<std::string, SensorData> data;
+
+  void init();
 };
 
 #endif

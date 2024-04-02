@@ -11,29 +11,25 @@ std::string UVSensor::getName() const
   return "UV";
 }
 
-std::string UVSensor::getUnits() const
-{
-  return "UV";
-}
-
-float UVSensor::getGasConcentration()
+std::map<std::string, SensorData> UVSensor::getData()
 {
   if (ltr.newDataAvailable())
   {
     uvReading = ltr.readUVS();
   }
-  return uvReading;
+  std::map<std::string, SensorData> data;
+  data["UV"] = SensorData(uvReading, "mW/cm^2");
+  return data;
 }
 
 void UVSensor::init()
 {
   ltr = Adafruit_LTR390();
 
-  if (!ltr.begin())
+  while (!ltr.begin())
   {
     Serial.println("Couldn't find LTR sensor!");
-    while (1)
-      delay(10);
+    delay(20);
   }
   Serial.println("Found LTR sensor!");
 

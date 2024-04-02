@@ -13,19 +13,15 @@ public:
   VOCNOXSensor(BLE &ble);
 
   std::string getName() const override;
-
-  std::string getUnits() const override;
-
-  float getGasConcentration() override;
-  float getTemperature() override;
-  float getHumidity() override;
+  std::map<std::string, SensorData> getData() override;
 
 private:
   SensirionI2CSvm41 svm41;
-  float voc;
-  float nox;
-  float temp;
-  float humd;
+  std::map<std::string, SensorData> data;
+  // float voc;
+  // float nox;
+  // float temp;
+  // float humd;
 
   void init();
 };

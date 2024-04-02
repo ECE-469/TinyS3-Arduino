@@ -7,22 +7,21 @@ GasSensor::GasSensor(BLE &ble)
 
 GasSensor::~GasSensor() {}
 
-void GasSensor::readAndSendData()
+std::map<std::string, SensorData> GasSensor::readAndSendData()
 {
-  float gasConcentration = getGasConcentration();
-  sendConcentrationViaBLE(gasConcentration);
+  std::map<std::string, SensorData> data = getData();
+  for (const auto &entry : data)
+  {
+    sendConcentrationViaBLE(entry.second);
+  }
+  return data;
 }
 
-float GasSensor::getGasConcentration()
-{
-  return NEGATIVE_INFINITY;
-}
-
-void GasSensor::sendConcentrationViaBLE(const float concentration)
+void GasSensor::sendConcentrationViaBLE(const SensorData &data)
 {
   // Convert to list of bytes
   byte bytes[sizeof(float)];
-  memcpy(bytes, &concentration, sizeof(float));
+  memcpy(bytes, &data.value, sizeof(float));
 
   // Set the characteristic value and notify
   std::string name = getName();
@@ -30,14 +29,4 @@ void GasSensor::sendConcentrationViaBLE(const float concentration)
   BLECharacteristic *characteristic = ble_->get_characteristic(name);
   characteristic->setValue(bytes, sizeof(bytes));
   characteristic->notify();
-}
-
-float GasSensor::getTemperature()
-{
-  return NEGATIVE_INFINITY;
-}
-
-float GasSensor::getHumidity()
-{
-  return NEGATIVE_INFINITY;
 }

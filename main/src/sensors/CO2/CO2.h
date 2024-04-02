@@ -13,14 +13,7 @@ public:
   CO2Sensor(BLE &ble);
 
   std::string getName() const override;
-
-  std::string getUnits() const override;
-
-  float getGasConcentration() override;
-
-  float getTemperature() override;
-
-  float getHumidity() override;
+  std::map<std::string, SensorData> getData() override;
 
 private:
   SensirionI2CScd4x scd4x;

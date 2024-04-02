@@ -8,26 +8,28 @@ PMSensor::PMSensor(BLE &ble)
 
 std::string PMSensor::getName() const
 {
-  return "PM";
+  return "PM2.5";
 }
 
-std::string PMSensor::getUnits() const
+std::map<std::string, SensorData> PMSensor::getData()
 {
-  return "count";
-}
+  PM25_AQI_Data pmData;
 
-float PMSensor::getGasConcentration()
-{
-  PM25_AQI_Data data;
-
-  if (!aqi.read(&data))
+  if (!aqi.read(&pmData))
   {
     Serial.println("Could not read from AQI");
     delay(50); // try again in a bit!
-    return NEGATIVE_INFINITY;
+    return data;
   }
-  return data.pm25_standard;
-
+  std::map<std::string, SensorData> newData;
+  newData["PM1.0"] = SensorData(pmData.pm10_standard, "ug/m3");
+  newData["PM2.5"] = SensorData(pmData.pm25_standard, "ug/m3");
+  newData["PM10"] = SensorData(pmData.pm100_standard, "ug/m3");
+  newData["PM1.0_env"] = SensorData(pmData.pm10_env, "ug/m3");
+  newData["PM2.5_env"] = SensorData(pmData.pm25_env, "ug/m3");
+  newData["PM10_env"] = SensorData(pmData.pm100_env, "ug/m3");
+  data = newData;
+  return data;
   // Serial.println();
   // Serial.println(F("---------------------------------------"));
   // Serial.println(F("Concentration Units (standard)"));
@@ -71,5 +73,12 @@ void PMSensor::init()
     delay(100);
   }
 
-  Serial.println("PM25 found!");
+  data["PM1.0"] = SensorData("ug/m3");
+  data["PM2.5"] = SensorData("ug/m3");
+  data["PM10"] = SensorData("ug/m3");
+  data["PM1.0_env"] = SensorData("ug/m3");
+  data["PM2.5_env"] = SensorData("ug/m3");
+  data["PM10_env"] = SensorData("ug/m3");
+
+  Serial.println("PM25 connected!");
 }
