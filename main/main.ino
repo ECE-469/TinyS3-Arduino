@@ -21,6 +21,7 @@ void setup()
   sensors.push_back(make_unique<O3Sensor>(*ble));
   sensors.push_back(make_unique<UVSensor>(*ble));
   sensors.push_back(make_unique<VOCNOXSensor>(*ble));
+  sensors.push_back(make_unique<PMSensor>(*ble));
 
   Serial.println("All Sensors Initialized!");
 }
