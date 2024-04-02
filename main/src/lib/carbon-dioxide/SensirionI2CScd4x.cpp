@@ -37,9 +37,6 @@
  */
 
 #include "SensirionI2CScd4x.h"
-#include "Arduino.h"
-#include "SensirionCore.h"
-#include <Wire.h>
 
 #define SCD4X_I2C_ADDRESS 0x62
 

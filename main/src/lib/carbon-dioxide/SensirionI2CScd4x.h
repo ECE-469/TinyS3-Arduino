@@ -39,9 +39,9 @@
 #ifndef SENSIRIONI2CSCD4X_H
 #define SENSIRIONI2CSCD4X_H
 
+#include "Arduino.h"
+#include "../sensirion-core/SensirionCore.h"
 #include <Wire.h>
-
-#include "SensirionCore.h"
 
 class SensirionI2CScd4x {
 

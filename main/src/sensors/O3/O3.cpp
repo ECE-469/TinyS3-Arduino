@@ -3,6 +3,7 @@
 O3Sensor::O3Sensor(BLE &ble)
     : GasSensor(ble)
 {
+  init();
 }
 
 std::string O3Sensor::getName() const

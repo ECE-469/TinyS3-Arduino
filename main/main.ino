@@ -17,7 +17,10 @@ void setup()
   BLE *ble = new BLE();
 
   sensors.push_back(make_unique<CO2Sensor>(*ble));
+  sensors.push_back(make_unique<COSensor>(*ble));
   sensors.push_back(make_unique<O3Sensor>(*ble));
+  sensors.push_back(make_unique<UVSensor>(*ble));
+  sensors.push_back(make_unique<VOCNOXSensor>(*ble));
 
   Serial.println("All Sensors Initialized!");
 }
@@ -27,14 +30,14 @@ void loop()
   for (const auto &sensor : sensors)
   {
     std::string name = sensor->getName();
-    Serial.println("\n");
+    Serial.print("\n");
     Serial.println(name.c_str());
-    if (name == "CO2")
+    if (name == "CO2" || name == "VOC+NOX")
     {
       Serial.println("Humidity: " + String(sensor->getHumidity()));
       Serial.println("Temperature: " + String(sensor->getTemperature()));
     }
-    Serial.println("concentration: " + String(sensor->getGasConcentration()) + sensor->getUnits().c_str());
+    Serial.println("Concentration: " + String(sensor->getGasConcentration()) + sensor->getUnits().c_str());
   }
   delay(5000);
 }

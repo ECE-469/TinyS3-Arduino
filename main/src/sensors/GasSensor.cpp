@@ -2,7 +2,6 @@
 
 GasSensor::GasSensor(BLE &ble)
 {
-  Serial.println("GasSensor constructor");
   ble_ = std::unique_ptr<BLE>(new BLE(ble));
 }
 
