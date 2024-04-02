@@ -16,6 +16,8 @@ void setup()
 
   BLE *ble = new BLE();
 
+  delay(1000); // Ensure all sensors are powered
+
   sensors.push_back(make_unique<CO2Sensor>(*ble));
   sensors.push_back(make_unique<COSensor>(*ble));
   sensors.push_back(make_unique<O3Sensor>(*ble));
@@ -24,6 +26,8 @@ void setup()
   sensors.push_back(make_unique<PMSensor>(*ble));
 
   Serial.println("All Sensors Initialized!");
+
+  delay(2500); // Allow sensors to acclimate
 }
 
 void loop()

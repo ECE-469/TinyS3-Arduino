@@ -26,7 +26,7 @@ float PMSensor::getGasConcentration()
     delay(50); // try again in a bit!
     return NEGATIVE_INFINITY;
   }
-  // Serial.println("AQI reading success");
+  return data.pm25_standard;
 
   // Serial.println();
   // Serial.println(F("---------------------------------------"));
@@ -60,17 +60,15 @@ float PMSensor::getGasConcentration()
   // Serial.print(F("Particles > 10 um / 0.1L air:"));
   // Serial.println(data.particles_100um);
   // Serial.println(F("---------------------------------------"));
-  return data.pm25_standard;
 }
 
 void PMSensor::init()
 {
   aqi = Adafruit_PM25AQI();
-  if (!aqi.begin_I2C())
+  while (!aqi.begin_I2C())
   {
     Serial.println("Could not find PM 2.5 sensor!");
-    while (1)
-      delay(10);
+    delay(100);
   }
 
   Serial.println("PM25 found!");
