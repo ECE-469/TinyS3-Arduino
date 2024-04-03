@@ -6,7 +6,7 @@
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
-// #include <BLE2902.h>
+#include "../sensors/GasSensor.h"
 #include <map>
 #include <string>
 
@@ -29,13 +29,14 @@ class BLE
 public:
   BLE();
   BLECharacteristic *get_characteristic(std::string name);
+  void send_data(std::map<std::string, SensorData> data);
 
 private:
   std::map<UUID, BLECharacteristic *> characteristic_map;
 
   void _init_characteristics(BLEService *pService);
   void _init_advertising();
-  BLECharacteristic *create_characteristic(const UUID uuid, BLEService *pService);
+  BLECharacteristic *create_characteristic(std::string sensor_name, BLEService *pService);
 };
 
 #endif // BLE_H

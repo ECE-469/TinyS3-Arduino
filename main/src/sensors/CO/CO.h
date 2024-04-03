@@ -3,7 +3,8 @@
 
 #include "../../lib/carbon-monoxide/DFRobot_MultiGasSensor.h"
 #include "../GasSensor.h"
-#include <string>
+
+#define I2C_ADDRESS 0x74
 
 class COSensor : public GasSensor
 {
@@ -12,6 +13,10 @@ public:
 
   std::string getName() const override;
   std::map<std::string, SensorData> getData() override;
+
+private:
+  void init();
+  DFRobot_GAS_I2C gas;
 };
 
 #endif

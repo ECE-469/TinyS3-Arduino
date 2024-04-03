@@ -1,16 +1,14 @@
 #include "CO.h"
 
-#define I2C_ADDRESS 0x74
-DFRobot_GAS_I2C gas(&Wire, I2C_ADDRESS);
-
-void init()
+void COSensor::init()
 {
+  gas = DFRobot_GAS_I2C(&Wire, I2C_ADDRESS);
   while (!gas.begin())
   {
-    Serial.println("NO Deivces !");
+    Serial.println("CO not found!");
     delay(500);
   }
-  Serial.println("The device is connected successfully!");
+  Serial.println("CO is connected successfully!");
 
   gas.changeAcquireMode(gas.PASSIVITY);
   delay(500);

@@ -1,10 +1,17 @@
 #include "BLE.h"
 
 std::map<SENSOR_NAME, UUID> sensor_uuid_map = {
-    {"CHARACTERISTIC", CHARACTERISTIC_UUID},
     {"CO", CHARACTERISTIC_CO_UUID},
     {"CO2", CHARACTERISTIC_CO2_UUID},
-    {"O3", CHARACTERISTIC_O3_UUID}};
+    {"UV", CHARACTERISTIC_UV_UUID},
+    {"VOC", CHARACTERISTIC_VOC_UUID},
+    {"O3", CHARACTERISTIC_O3_UUID},
+    {"Temperature", CHARACTERISTIC_TEMP_UUID},
+    {"Humidity", CHARACTERISTIC_HUMD_UUID},
+    {"PM2.5", CHARACTERISTIC_PM25_UUID},
+    {"PM10", CHARACTERISTIC_PM100_UUID},
+    {"PM1.0", CHARACTERISTIC_PM10_UUID},
+    {"NOx", CHARACTERISTIC_NOX_UUID}};
 
 void CustomServerCallbacks::onConnect(BLEServer *pServer)
 {
@@ -24,7 +31,8 @@ BLE::BLE()
   BLEServer *pServer = BLEDevice::createServer();
   CustomServerCallbacks *myServerCallbacks = new CustomServerCallbacks();
   pServer->setCallbacks(myServerCallbacks);
-  BLEService *pService = pServer->createService(SERVICE_UUID);
+  BLEService *pService = pServer->createService(BLEUUID(SERVICE_UUID), 40);
+  Serial.println("Service created with UUID: " + String(SERVICE_UUID));
   _init_characteristics(pService);
   pService->start();
   _init_advertising();
@@ -38,12 +46,19 @@ BLECharacteristic *BLE::get_characteristic(std::string name)
 
 void BLE::_init_characteristics(BLEService *pService)
 {
-  std::vector<std::string> sensor_list = {"CO", "CO2"};
-  for (auto sensor : sensor_list)
+  Serial.println("Initializing characteristics");
+  std::vector<std::string> sensor_names;
+  for (const auto &pair : sensor_uuid_map)
+  {
+    sensor_names.push_back(pair.first);
+  }
+  Serial.println("Initializing characteristics for sensors: " + String(sensor_names.size()));
+  for (auto sensor : sensor_names)
   {
     UUID sensor_uuid = sensor_uuid_map[sensor];
-    BLECharacteristic *characteristic = create_characteristic(sensor_uuid, pService);
+    BLECharacteristic *characteristic = create_characteristic(sensor, pService);
     characteristic_map[sensor_uuid] = characteristic;
+    Serial.println("Initialized characteristic for " + String(sensor.c_str()) + " with UUID: " + sensor_uuid.c_str() + " and value: " + characteristic->getValue().c_str());
   }
 }
 
@@ -57,12 +72,40 @@ void BLE::_init_advertising()
   BLEDevice::startAdvertising();
 }
 
-BLECharacteristic *BLE::create_characteristic(const UUID uuid, BLEService *pService)
+BLECharacteristic *BLE::create_characteristic(std::string sensor_name, BLEService *pService)
 {
+  UUID uuid = sensor_uuid_map[sensor_name];
   BLECharacteristic *characteristic = pService->createCharacteristic(uuid, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
   BLEUUID cccdUUID(BLEUUID((uint16_t)0x2902)); // Standard UUID for CCCD
   BLEDescriptor *pDescriptor = new BLEDescriptor(cccdUUID);
   pDescriptor->setAccessPermissions(ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE);
+  Serial.println(String(pDescriptor->toString().c_str()));
   characteristic->addDescriptor(pDescriptor);
+  characteristic->setValue(0);
   return characteristic;
+}
+
+void BLE::send_data(std::map<std::string, SensorData> data)
+{
+  for (const auto &data : data)
+  {
+    // Convert to list of bytes
+    byte bytes[sizeof(float)];
+    memcpy(bytes, &data.second.value, sizeof(float));
+
+    // Set the characteristic value and notify
+    BLECharacteristic *characteristic = get_characteristic(data.first);
+
+    if (characteristic == nullptr)
+    {
+      Serial.println("Characteristic " + String(data.first.c_str()) + " not found");
+    }
+    else
+    {
+      Serial.println("Sending data for " + String(data.first.c_str()) + ": " + String(data.second.value) + data.second.units.c_str() + " on UUID: " + characteristic->getUUID().toString().c_str());
+      characteristic->setValue(bytes, sizeof(bytes));
+      characteristic->notify();
+      delay(10);
+    }
+  }
 }

@@ -1,8 +1,12 @@
 #include "src/sensors/sensors.h"
+#include "src/bluetooth/BLE.h"
+#include <string>
 #include <vector>
 #include <memory>
+#include <map>
 
 std::vector<std::unique_ptr<GasSensor>> sensors;
+BLE *ble;
 
 template <typename T, typename... Args>
 std::unique_ptr<T> make_unique(Args &&...args)
@@ -14,9 +18,11 @@ void setup()
 {
   Serial.begin(115200);
 
-  BLE *ble = new BLE();
+  ble = new BLE();
 
   delay(500); // Ensure all sensors are powered
+
+  Serial.println("Initializing Sensors");
 
   sensors.push_back(make_unique<CO2Sensor>());
   sensors.push_back(make_unique<COSensor>());
@@ -27,22 +33,49 @@ void setup()
 
   Serial.println("All Sensors Initialized!");
 
-  delay(1000); // Allow sensors to acclimate
+  delay(5000); // Allow sensors to acclimate
 }
 
 void loop()
 {
-
+  float tempAvg = 0;
+  float humdAvg = 0;
+  int tempCount = 0;
+  int humdCount = 0;
+  std::map<std::string, SensorData> allSensorData;
   for (const auto &sensor : sensors)
   {
-    std::string name = sensor->getName();
-    Serial.print("\n");
-    Serial.println(name.c_str());
     std::map<std::string, SensorData> sensorData = sensor->getData();
     for (const auto &data : sensorData)
     {
-      Serial.println(String(data.first.c_str()) + ": " + String(data.second.value) + data.second.units.c_str());
+      if (data.first == "Temperature" && data.second.value > NEGATIVE_INFINITY)
+      {
+        tempAvg += data.second.value;
+        tempCount++;
+      }
+      else if (data.first == "Humidity" && data.second.value > NEGATIVE_INFINITY)
+      {
+        humdAvg += data.second.value;
+        humdCount++;
+      }
+      else
+      {
+        allSensorData[data.first] = data.second;
+      }
     }
   }
-  delay(40000);
+  if (tempCount > 0)
+  {
+    allSensorData["Temperature"] = SensorData(tempAvg / tempCount, "C");
+  }
+  if (humdCount > 0)
+  {
+    allSensorData["Humidity"] = SensorData(humdAvg / humdCount, "%");
+  }
+  Serial.println("Average Temp: " + String(allSensorData["Temperature"].value) + allSensorData["Temperature"].units.c_str());
+  Serial.println("Average Humd: " + String(allSensorData["Humidity"].value) + allSensorData["Humidity"].units.c_str());
+
+  ble->send_data(allSensorData);
+
+  delay(10000);
 }

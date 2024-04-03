@@ -32,10 +32,20 @@ std::map<std::string, SensorData> VOCNOXSensor::getData()
   }
   else
   {
+    if (temperature == 0)
+    {
+      Serial.println("Temperature is 0?!?!?!");
+    }
+    if (temperature > 0 && temperature < 100)
+    {
+      data["Temperature"] = SensorData(temperature, "C");
+    }
+    if (humidity > 0 && humidity < 100)
+    {
+      data["Humidity"] = SensorData(humidity, "%");
+    }
     data["VOC"] = SensorData(vocIndex, "ppb");
     data["NOx"] = SensorData(noxIndex, "ppb");
-    data["Temperature"] = SensorData(temperature, "C");
-    data["Humidity"] = SensorData(humidity, "%");
   }
 
   return data;
