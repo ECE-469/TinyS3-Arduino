@@ -1,7 +1,7 @@
 #include "O3.h"
 
-O3Sensor::O3Sensor(BLE &ble)
-    : GasSensor(ble)
+O3Sensor::O3Sensor()
+    : GasSensor()
 {
   init();
 }
@@ -13,7 +13,6 @@ std::string O3Sensor::getName() const
 
 std::map<std::string, SensorData> O3Sensor::getData()
 {
-  std::map<std::string, SensorData> data;
   data["O3"] = SensorData(Ozone.readOzoneData(COLLECT_NUMBER), "ppb");
   return data;
 }

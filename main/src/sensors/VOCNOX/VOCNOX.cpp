@@ -1,7 +1,7 @@
 #include "VOCNOX.h"
 
-VOCNOXSensor::VOCNOXSensor(BLE &ble)
-    : GasSensor(ble)
+VOCNOXSensor::VOCNOXSensor()
+    : GasSensor()
 {
   init();
 }
@@ -13,6 +13,8 @@ std::string VOCNOXSensor::getName() const
 
 std::map<std::string, SensorData> VOCNOXSensor::getData()
 {
+  svm41.startMeasurement();
+  delay(55); // Delay to let the sensor take a reading
   uint16_t error;
   char errorMessage[256];
 
@@ -111,14 +113,14 @@ void VOCNOXSensor::init()
     Serial.println();
   }
 
-  // Start Measurement
-  error = svm41.startMeasurement();
-  if (error)
-  {
-    Serial.print("Error trying to execute startMeasurement(): ");
-    errorToString(error, errorMessage, 256);
-    Serial.println(errorMessage);
-  }
+  // // Start Measurement
+  // error = svm41.startMeasurement();
+  // if (error)
+  // {
+  //   Serial.print("Error trying to execute startMeasurement(): ");
+  //   errorToString(error, errorMessage, 256);
+  //   Serial.println(errorMessage);
+  // }
   data["VOC"] = SensorData("ppb");
   data["NOx"] = SensorData("ppb");
   data["Temperature"] = SensorData("C");

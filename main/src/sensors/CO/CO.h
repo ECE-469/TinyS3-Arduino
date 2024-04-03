@@ -8,7 +8,7 @@
 class COSensor : public GasSensor
 {
 public:
-  COSensor(BLE &ble);
+  COSensor();
 
   std::string getName() const override;
   std::map<std::string, SensorData> getData() override;

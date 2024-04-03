@@ -10,17 +10,13 @@
 class CO2Sensor : public GasSensor
 {
 public:
-  CO2Sensor(BLE &ble);
+  CO2Sensor();
 
   std::string getName() const override;
   std::map<std::string, SensorData> getData() override;
 
 private:
   SensirionI2CScd4x scd4x;
-  uint16_t error;
-  uint16_t co2;
-  float temperature;
-  float humidity;
 
   bool checkDataReady();
   void safeRead();

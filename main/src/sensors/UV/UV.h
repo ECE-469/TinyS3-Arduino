@@ -10,14 +10,13 @@
 class UVSensor : public GasSensor
 {
 public:
-  UVSensor(BLE &ble);
+  UVSensor();
 
   std::string getName() const override;
   std::map<std::string, SensorData> getData() override;
 
 private:
   Adafruit_LTR390 ltr;
-  float uvReading;
 
   void init();
 };

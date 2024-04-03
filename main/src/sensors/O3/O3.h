@@ -13,7 +13,7 @@
 class O3Sensor : public GasSensor
 {
 public:
-  O3Sensor(BLE &ble);
+  O3Sensor();
 
   std::string getName() const override;
   std::map<std::string, SensorData> getData() override;

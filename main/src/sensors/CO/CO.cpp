@@ -3,25 +3,25 @@
 #define I2C_ADDRESS 0x74
 DFRobot_GAS_I2C gas(&Wire, I2C_ADDRESS);
 
-void init_CO()
+void init()
 {
   while (!gas.begin())
   {
     Serial.println("NO Deivces !");
-    delay(1000);
+    delay(500);
   }
   Serial.println("The device is connected successfully!");
 
   gas.changeAcquireMode(gas.PASSIVITY);
-  delay(1000);
+  delay(500);
 
-  gas.setTempCompensation(gas.OFF);
+  gas.setTempCompensation(gas.ON);
 }
 
-COSensor::COSensor(BLE &ble)
-    : GasSensor(ble)
+COSensor::COSensor()
+    : GasSensor()
 {
-  init_CO();
+  init();
 }
 
 std::string COSensor::getName() const
@@ -31,7 +31,14 @@ std::string COSensor::getName() const
 
 std::map<std::string, SensorData> COSensor::getData()
 {
-  std::map<std::string, SensorData> data;
-  data["CO"] = SensorData(gas.readGasConcentrationPPM(), "ppm");
+  if (gas.dataIsAvailable())
+  {
+    data["Temperature"] = SensorData(gas.readTempC(), "C");
+    data["CO"] = SensorData(gas.readGasConcentrationPPM(), "ppm");
+  }
+  else
+  {
+    Serial.println("CO data not available");
+  }
   return data;
 }

@@ -1,7 +1,7 @@
 #include "CO2.h"
 
-CO2Sensor::CO2Sensor(BLE &ble)
-    : GasSensor(ble)
+CO2Sensor::CO2Sensor()
+    : GasSensor()
 {
   init();
 }
@@ -14,10 +14,6 @@ std::string CO2Sensor::getName() const
 std::map<std::string, SensorData> CO2Sensor::getData()
 {
   safeRead();
-  std::map<std::string, SensorData> data;
-  data["CO2"] = SensorData(co2, "ppm");
-  data["Temperature"] = SensorData(temperature, "°C");
-  data["Humidity"] = SensorData(humidity, "%");
   return data;
 }
 
@@ -39,9 +35,10 @@ bool CO2Sensor::checkDataReady()
 void CO2Sensor::safeRead()
 {
   char errorMessage[256];
-  uint16_t old_co2 = co2;
-  float old_temperature = temperature;
-  float old_humidity = humidity;
+  uint16_t error;
+  uint16_t co2;
+  float temperature;
+  float humidity;
   if (checkDataReady())
   {
     error = scd4x.readMeasurement(co2, temperature, humidity);
@@ -50,17 +47,21 @@ void CO2Sensor::safeRead()
       Serial.print("Error trying to execute readMeasurement(): ");
       errorToString(error, errorMessage, 256);
       Serial.println(errorMessage);
-      co2 = old_co2;
-      temperature = old_temperature;
-      humidity = old_humidity;
     }
     else if (co2 <= 0)
     {
       Serial.println("Invalid sample detected, skipping.");
-      co2 = old_co2;
-      temperature = old_temperature;
-      humidity = old_humidity;
     }
+    else
+    {
+      data["CO2"] = SensorData(co2, "ppm");
+      data["Temperature"] = SensorData(temperature, "C");
+      data["Humidity"] = SensorData(humidity, "%");
+    }
+  }
+  else
+  {
+    Serial.println("Data not ready, skipping.");
   }
 }
 
@@ -119,15 +120,11 @@ void CO2Sensor::init()
   {
     printSerialNumber(serial0, serial1, serial2);
   }
-
-  // Start Measurement
-  error = scd4x.startPeriodicMeasurement();
+  error = scd4x.startLowPowerPeriodicMeasurement();
   if (error)
   {
-    Serial.print("Error trying to execute startPeriodicMeasurement(): ");
+    Serial.print("Error trying to execute startLowPowerPeriodicMeasurement(): ");
     errorToString(error, errorMessage, 256);
     Serial.println(errorMessage);
   }
-
-  Serial.println("Waiting for first measurement... (5 sec)");
 }

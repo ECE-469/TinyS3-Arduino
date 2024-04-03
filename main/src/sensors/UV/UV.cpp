@@ -1,7 +1,7 @@
 #include "UV.h"
 
-UVSensor::UVSensor(BLE &ble)
-    : GasSensor(ble)
+UVSensor::UVSensor()
+    : GasSensor()
 {
   init();
 }
@@ -13,11 +13,12 @@ std::string UVSensor::getName() const
 
 std::map<std::string, SensorData> UVSensor::getData()
 {
-  if (ltr.newDataAvailable())
+  if (!ltr.newDataAvailable())
   {
-    uvReading = ltr.readUVS();
+    Serial.println("No new data available");
+    return data;
   }
-  std::map<std::string, SensorData> data;
+  float uvReading = ltr.readUVS();
   data["UV"] = SensorData(uvReading, "mW/cm^2");
   return data;
 }

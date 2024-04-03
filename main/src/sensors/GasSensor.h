@@ -24,25 +24,15 @@ struct SensorData
 class GasSensor
 {
 public:
-  GasSensor(BLE &ble);
-  virtual ~GasSensor();
-
-  std::map<std::string, SensorData> readAndSendData();
+  GasSensor(){};
+  ~GasSensor(){};
 
   // Pure virtual methods to be implemented by derived classes
   virtual std::string getName() const = 0;
   virtual std::map<std::string, SensorData> getData() = 0;
 
-  // Virtual methods with default implementations
-  // virtual float getTemperature();
-  // virtual float getHumidity();
-
 protected:
-  // Pointer to the BLE Class
-  std::unique_ptr<BLE> ble_;
-
-private:
-  void sendConcentrationViaBLE(const SensorData &data);
+  std::map<std::string, SensorData> data;
 };
 
 #endif
