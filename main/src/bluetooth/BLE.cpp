@@ -32,7 +32,6 @@ BLE::BLE()
   CustomServerCallbacks *myServerCallbacks = new CustomServerCallbacks();
   pServer->setCallbacks(myServerCallbacks);
   BLEService *pService = pServer->createService(BLEUUID(SERVICE_UUID), 40);
-  Serial.println("Service created with UUID: " + String(SERVICE_UUID));
   _init_characteristics(pService);
   pService->start();
   _init_advertising();
@@ -46,19 +45,17 @@ BLECharacteristic *BLE::get_characteristic(std::string name)
 
 void BLE::_init_characteristics(BLEService *pService)
 {
-  Serial.println("Initializing characteristics");
   std::vector<std::string> sensor_names;
   for (const auto &pair : sensor_uuid_map)
   {
     sensor_names.push_back(pair.first);
   }
-  Serial.println("Initializing characteristics for sensors: " + String(sensor_names.size()));
   for (auto sensor : sensor_names)
   {
     UUID sensor_uuid = sensor_uuid_map[sensor];
     BLECharacteristic *characteristic = create_characteristic(sensor, pService);
     characteristic_map[sensor_uuid] = characteristic;
-    Serial.println("Initialized characteristic for " + String(sensor.c_str()) + " with UUID: " + sensor_uuid.c_str() + " and value: " + characteristic->getValue().c_str());
+    Serial.println("Initialized characteristic for " + String(sensor.c_str()) + " with UUID: " + sensor_uuid.c_str());
   }
 }
 
@@ -79,9 +76,11 @@ BLECharacteristic *BLE::create_characteristic(std::string sensor_name, BLEServic
   BLEUUID cccdUUID(BLEUUID((uint16_t)0x2902)); // Standard UUID for CCCD
   BLEDescriptor *pDescriptor = new BLEDescriptor(cccdUUID);
   pDescriptor->setAccessPermissions(ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE);
-  Serial.println(String(pDescriptor->toString().c_str()));
   characteristic->addDescriptor(pDescriptor);
-  characteristic->setValue(0);
+  float zero = 0.0;
+  byte bytes[sizeof(float)];
+  memcpy(bytes, &zero, sizeof(float));
+  characteristic->setValue(bytes, sizeof(bytes));
   return characteristic;
 }
 

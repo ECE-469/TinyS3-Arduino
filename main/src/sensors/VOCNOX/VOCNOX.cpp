@@ -63,13 +63,15 @@ void VOCNOXSensor::init()
   error = svm41.deviceReset();
   if (error)
   {
-    Serial.print("Error trying to execute deviceReset(): ");
-    errorToString(error, errorMessage, 256);
-    Serial.println(errorMessage);
+    Serial.println("VOC/NOx not found!");
+    // Serial.print("Error trying to execute deviceReset(): ");
+    // errorToString(error, errorMessage, 256);
+    // Serial.println(errorMessage);
+    return;
   }
 
   // Delay to let the serial monitor catch up
-  delay(1000);
+  delay(500);
 
   uint8_t serialNumber[32];
   uint8_t serialNumberSize = 32;
@@ -79,10 +81,11 @@ void VOCNOXSensor::init()
     Serial.print("Error trying to execute getSerialNumber(): ");
     errorToString(error, errorMessage, 256);
     Serial.println(errorMessage);
+    return;
   }
   else
   {
-    Serial.print("SerialNumber:");
+    Serial.print("VOC/NOx SerialNumber:");
     Serial.println((char *)serialNumber);
   }
 
@@ -102,6 +105,7 @@ void VOCNOXSensor::init()
     Serial.print("Error trying to execute getVersion(): ");
     errorToString(error, errorMessage, 256);
     Serial.println(errorMessage);
+    return;
   }
   else
   {
@@ -122,17 +126,11 @@ void VOCNOXSensor::init()
     Serial.print(protocolMinor);
     Serial.println();
   }
-
-  // // Start Measurement
-  // error = svm41.startMeasurement();
-  // if (error)
-  // {
-  //   Serial.print("Error trying to execute startMeasurement(): ");
-  //   errorToString(error, errorMessage, 256);
-  //   Serial.println(errorMessage);
-  // }
   data["VOC"] = SensorData("ppb");
   data["NOx"] = SensorData("ppb");
   data["Temperature"] = SensorData("C");
   data["Humidity"] = SensorData("%");
+
+  Serial.println("VOC/NOx connected!");
+  initialized = true;
 }

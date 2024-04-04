@@ -3,16 +3,18 @@
 void COSensor::init()
 {
   gas = DFRobot_GAS_I2C(&Wire, I2C_ADDRESS);
-  while (!gas.begin())
+  delay(250);
+  if (!gas.begin())
   {
     Serial.println("CO not found!");
-    delay(500);
+    return;
   }
-  Serial.println("CO is connected successfully!");
+  Serial.println("CO connected!");
+
+  initialized = true;
 
   gas.changeAcquireMode(gas.PASSIVITY);
   delay(500);
-
   gas.setTempCompensation(gas.ON);
 }
 

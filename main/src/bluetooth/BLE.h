@@ -6,7 +6,7 @@
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
-#include "../sensors/GasSensor.h"
+#include "../sensors/sensorData.h"
 #include <map>
 #include <string>
 

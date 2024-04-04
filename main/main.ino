@@ -20,9 +20,7 @@ void setup()
 
   ble = new BLE();
 
-  delay(500); // Ensure all sensors are powered
-
-  Serial.println("Initializing Sensors");
+  delay(20); // Ensure all sensors are powered
 
   sensors.push_back(make_unique<CO2Sensor>());
   sensors.push_back(make_unique<COSensor>());
@@ -45,6 +43,12 @@ void loop()
   std::map<std::string, SensorData> allSensorData;
   for (const auto &sensor : sensors)
   {
+    if (!sensor->isInitialized())
+    {
+      Serial.println(String(sensor->getName().c_str()) + " not initialized, trying again...");
+      sensor->init();
+      continue;
+    }
     std::map<std::string, SensorData> sensorData = sensor->getData();
     for (const auto &data : sensorData)
     {
@@ -67,13 +71,13 @@ void loop()
   if (tempCount > 0)
   {
     allSensorData["Temperature"] = SensorData(tempAvg / tempCount, "C");
+    Serial.println("Average Temp: " + String(allSensorData["Temperature"].value) + allSensorData["Temperature"].units.c_str());
   }
   if (humdCount > 0)
   {
     allSensorData["Humidity"] = SensorData(humdAvg / humdCount, "%");
+    Serial.println("Average Humd: " + String(allSensorData["Humidity"].value) + allSensorData["Humidity"].units.c_str());
   }
-  Serial.println("Average Temp: " + String(allSensorData["Temperature"].value) + allSensorData["Temperature"].units.c_str());
-  Serial.println("Average Humd: " + String(allSensorData["Humidity"].value) + allSensorData["Humidity"].units.c_str());
 
   ble->send_data(allSensorData);
 

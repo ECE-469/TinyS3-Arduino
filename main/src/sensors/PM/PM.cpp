@@ -30,15 +30,17 @@ std::map<std::string, SensorData> PMSensor::getData()
 void PMSensor::init()
 {
   aqi = Adafruit_PM25AQI();
-  while (!aqi.begin_I2C())
+  delay(250);
+  if (!aqi.begin_I2C())
   {
-    Serial.println("Could not find PM 2.5 sensor!");
-    delay(100);
+    Serial.println("PM2.5 not found!");
+    return;
   }
 
   data["PM1.0"] = SensorData("ug/m3");
   data["PM2.5"] = SensorData("ug/m3");
   data["PM10"] = SensorData("ug/m3");
 
-  Serial.println("PM25 connected!");
+  Serial.println("PM2.5 connected!");
+  initialized = true;
 }

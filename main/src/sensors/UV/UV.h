@@ -14,11 +14,10 @@ public:
 
   std::string getName() const override;
   std::map<std::string, SensorData> getData() override;
+  void init() override;
 
 private:
   Adafruit_LTR390 ltr;
-
-  void init();
 };
 
 #endif

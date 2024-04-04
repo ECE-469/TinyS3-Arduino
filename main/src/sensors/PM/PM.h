@@ -14,10 +14,10 @@ public:
 
   std::string getName() const override;
   std::map<std::string, SensorData> getData() override;
+  void init() override;
 
 private:
   Adafruit_PM25AQI aqi;
-  void init();
 };
 
 #endif

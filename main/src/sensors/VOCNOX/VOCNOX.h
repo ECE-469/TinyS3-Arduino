@@ -14,11 +14,10 @@ public:
 
   std::string getName() const override;
   std::map<std::string, SensorData> getData() override;
+  void init() override;
 
 private:
   SensirionI2CSvm41 svm41;
-
-  void init();
 };
 
 #endif
