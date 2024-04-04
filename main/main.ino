@@ -1,3 +1,5 @@
+// TODO: add https://github.com/UnexpectedMaker/esp32s3-arduino-helper/tree/main?tab=readme-ov-file
+
 #include "src/sensors/sensors.h"
 #include "src/bluetooth/BLE.h"
 #include <string>

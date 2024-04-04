@@ -63,7 +63,7 @@ void VOCNOXSensor::init()
   error = svm41.deviceReset();
   if (error)
   {
-    Serial.println("VOC/NOx not found!");
+    Serial.println("SGP41 not found!");
     // Serial.print("Error trying to execute deviceReset(): ");
     // errorToString(error, errorMessage, 256);
     // Serial.println(errorMessage);
@@ -85,7 +85,7 @@ void VOCNOXSensor::init()
   }
   else
   {
-    Serial.print("VOC/NOx SerialNumber:");
+    Serial.print("SGP41 SerialNumber:");
     Serial.println((char *)serialNumber);
   }
 
@@ -131,6 +131,6 @@ void VOCNOXSensor::init()
   data["Temperature"] = SensorData("C");
   data["Humidity"] = SensorData("%");
 
-  Serial.println("VOC/NOx connected!");
+  Serial.println("SGP41 connected!");
   initialized = true;
 }
