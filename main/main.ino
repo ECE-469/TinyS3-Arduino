@@ -50,6 +50,7 @@ void loop()
     {
       if (data.first == "Temperature" && data.second.value > NEGATIVE_INFINITY)
       {
+        Serial.println(String(sensor->getName().c_str()) + " Temp: " + String(data.second.value) + data.second.units.c_str());
         tempAvg += data.second.value;
         tempCount++;
       }
