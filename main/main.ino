@@ -97,12 +97,12 @@ void setup()
 
   delay(20); // Ensure all sensors are powered
 
-  // sensors.push_back(make_unique<CO2Sensor>());
+  sensors.push_back(make_unique<CO2Sensor>());
   sensors.push_back(make_unique<COSensor>());
-  // sensors.push_back(make_unique<O3Sensor>());
-  // sensors.push_back(make_unique<UVSensor>());
-  // sensors.push_back(make_unique<VOCNOXSensor>());
-  // sensors.push_back(make_unique<PMSensor>());
+  sensors.push_back(make_unique<O3Sensor>());
+  sensors.push_back(make_unique<UVSensor>());
+  sensors.push_back(make_unique<VOCNOXSensor>());
+  sensors.push_back(make_unique<PMSensor>());
 
   Serial.println("All Sensors Initialized!");
 
