@@ -11,7 +11,8 @@ std::map<SENSOR_NAME, UUID> sensor_uuid_map = {
     {"PM2.5", CHARACTERISTIC_PM25_UUID},
     {"PM10", CHARACTERISTIC_PM100_UUID},
     {"PM1.0", CHARACTERISTIC_PM10_UUID},
-    {"NOx", CHARACTERISTIC_NOX_UUID}};
+    {"NOx", CHARACTERISTIC_NOX_UUID},
+    {"Battery", CHARACTERISTIC_BATTERY_PERCENT_UUID}};
 
 void CustomServerCallbacks::onConnect(BLEServer *pServer)
 {

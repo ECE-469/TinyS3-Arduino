@@ -1,12 +1,20 @@
 #include "src/sensors/sensors.h"
 #include "src/bluetooth/BLE.h"
+#include "src/lib/esp32s3-arduino-helper-1.0.1/src/UMS3.h"
 #include <string>
 #include <vector>
 #include <memory>
 #include <map>
 
+#define MAX_LOOP_COUNT 15
+#define BATTERY_MAX 4.20 // maximum voltage of battery
+#define BATTERY_MIN 3.2  // minimum voltage of battery before shutdown
+
 std::vector<std::unique_ptr<GasSensor>> sensors;
+std::map<std::string, SensorData> allSensorData;
+int loopCount = MAX_LOOP_COUNT;
 BLE *ble;
+UMS3 ums3;
 
 template <typename T, typename... Args>
 std::unique_ptr<T> make_unique(Args &&...args)
@@ -18,18 +26,20 @@ void setup()
 {
   Serial.begin(115200);
 
+  ums3.begin();
+
   ble = new BLE();
 
   delay(500); // Ensure all sensors are powered
 
   Serial.println("Initializing Sensors");
 
-  sensors.push_back(make_unique<CO2Sensor>());
+  // sensors.push_back(make_unique<CO2Sensor>());
   sensors.push_back(make_unique<COSensor>());
-  sensors.push_back(make_unique<O3Sensor>());
-  sensors.push_back(make_unique<UVSensor>());
-  sensors.push_back(make_unique<VOCNOXSensor>());
-  sensors.push_back(make_unique<PMSensor>());
+  // sensors.push_back(make_unique<O3Sensor>());
+  // sensors.push_back(make_unique<UVSensor>());
+  // sensors.push_back(make_unique<VOCNOXSensor>());
+  // sensors.push_back(make_unique<PMSensor>());
 
   Serial.println("All Sensors Initialized!");
 
@@ -37,6 +47,18 @@ void setup()
 }
 
 void loop()
+{
+  if (loopCount == MAX_LOOP_COUNT)
+  {
+    std::map<std::string, SensorData> allSensorData = getAllSensorData();
+    loopCount = 0;
+  }
+  ble->send_data(allSensorData);
+  loopCount++;
+  delay(2000);
+}
+
+std::map<std::string, SensorData> getAllSensorData()
 {
   float tempAvg = 0;
   float humdAvg = 0;
@@ -76,7 +98,19 @@ void loop()
   Serial.println("Average Temp: " + String(allSensorData["Temperature"].value) + allSensorData["Temperature"].units.c_str());
   Serial.println("Average Humd: " + String(allSensorData["Humidity"].value) + allSensorData["Humidity"].units.c_str());
 
-  ble->send_data(allSensorData);
+  allSensorData["Battery"] = SensorData(getBatteryPercent(), "%");
+  return allSensorData;
+}
 
-  delay(10000);
+float getBatteryPercent()
+{
+  float batteryVoltage = ums3.getBatteryVoltage();
+
+  // round value by two precision
+  float voltage = roundf(batteryVoltage * 100) / 100;
+  float output = ((voltage - BATTERY_MIN) / (BATTERY_MAX - BATTERY_MIN)) * 100;
+  if (output < 100)
+    return output;
+  else
+    return 100.0f;
 }
