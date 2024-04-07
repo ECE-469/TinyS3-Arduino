@@ -14,13 +14,13 @@ public:
 
   std::string getName() const override;
   std::map<std::string, SensorData> getData() override;
+  void init() override;
 
 private:
   SensirionI2CScd4x scd4x;
 
   bool checkDataReady();
   void safeRead();
-  void init();
   void printUint16Hex(uint16_t value);
   void printSerialNumber(uint16_t serial0, uint16_t serial1, uint16_t serial2);
 };

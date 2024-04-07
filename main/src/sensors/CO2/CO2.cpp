@@ -84,12 +84,6 @@ void CO2Sensor::printSerialNumber(uint16_t serial0, uint16_t serial1, uint16_t s
 
 void CO2Sensor::init()
 {
-
-  while (!Serial)
-  {
-    delay(100);
-  }
-
   Wire.begin();
 
   uint16_t error;
@@ -101,9 +95,11 @@ void CO2Sensor::init()
   error = scd4x.stopPeriodicMeasurement();
   if (error)
   {
-    Serial.print("Error trying to execute stopPeriodicMeasurement(): ");
-    errorToString(error, errorMessage, 256);
-    Serial.println(errorMessage);
+    Serial.println("CO2 not found!");
+    // Serial.print("Error trying to execute stopPeriodicMeasurement(): ");
+    // errorToString(error, errorMessage, 256);
+    // Serial.println(errorMessage);
+    return;
   }
 
   uint16_t serial0;
@@ -115,9 +111,11 @@ void CO2Sensor::init()
     Serial.print("Error trying to execute getSerialNumber(): ");
     errorToString(error, errorMessage, 256);
     Serial.println(errorMessage);
+    return;
   }
   else
   {
+    Serial.println("SCD4x connected!");
     printSerialNumber(serial0, serial1, serial2);
   }
   error = scd4x.startLowPowerPeriodicMeasurement();
@@ -126,5 +124,7 @@ void CO2Sensor::init()
     Serial.print("Error trying to execute startLowPowerPeriodicMeasurement(): ");
     errorToString(error, errorMessage, 256);
     Serial.println(errorMessage);
+    return;
   }
+  initialized = true;
 }

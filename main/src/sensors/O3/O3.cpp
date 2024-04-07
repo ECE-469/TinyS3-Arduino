@@ -19,11 +19,13 @@ std::map<std::string, SensorData> O3Sensor::getData()
 
 void O3Sensor::init()
 {
-  while (!Ozone.begin(Ozone_IICAddress))
+  delay(250);
+  if (!Ozone.begin(Ozone_IICAddress))
   {
-    Serial.println("I2c device number error!");
-    delay(1000);
+    Serial.println("O3 not found!");
+    return;
   }
-  Serial.println("I2c connected!");
+  Serial.println("O3 connected!");
   Ozone.setModes(MEASURE_MODE_PASSIVE);
+  initialized = true;
 }

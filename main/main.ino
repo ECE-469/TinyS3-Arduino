@@ -1,3 +1,5 @@
+// TODO: add https://github.com/UnexpectedMaker/esp32s3-arduino-helper/tree/main?tab=readme-ov-file
+
 #include "src/sensors/sensors.h"
 #include "src/bluetooth/BLE.h"
 #include "src/lib/esp32s3-arduino-helper-1.0.1/src/UMS3.h"
@@ -30,9 +32,7 @@ void setup()
 
   ble = new BLE();
 
-  delay(500); // Ensure all sensors are powered
-
-  Serial.println("Initializing Sensors");
+  delay(20); // Ensure all sensors are powered
 
   // sensors.push_back(make_unique<CO2Sensor>());
   sensors.push_back(make_unique<COSensor>());
@@ -67,6 +67,12 @@ std::map<std::string, SensorData> getAllSensorData()
   std::map<std::string, SensorData> allSensorData;
   for (const auto &sensor : sensors)
   {
+    if (!sensor->isInitialized())
+    {
+      Serial.println(String(sensor->getName().c_str()) + " not initialized, trying again...");
+      sensor->init();
+      continue;
+    }
     std::map<std::string, SensorData> sensorData = sensor->getData();
     for (const auto &data : sensorData)
     {
@@ -90,13 +96,13 @@ std::map<std::string, SensorData> getAllSensorData()
   if (tempCount > 0)
   {
     allSensorData["Temperature"] = SensorData(tempAvg / tempCount, "C");
+    Serial.println("Average Temp: " + String(allSensorData["Temperature"].value) + allSensorData["Temperature"].units.c_str());
   }
   if (humdCount > 0)
   {
     allSensorData["Humidity"] = SensorData(humdAvg / humdCount, "%");
+    Serial.println("Average Humd: " + String(allSensorData["Humidity"].value) + allSensorData["Humidity"].units.c_str());
   }
-  Serial.println("Average Temp: " + String(allSensorData["Temperature"].value) + allSensorData["Temperature"].units.c_str());
-  Serial.println("Average Humd: " + String(allSensorData["Humidity"].value) + allSensorData["Humidity"].units.c_str());
 
   allSensorData["Battery"] = SensorData(getBatteryPercent(), "%");
   return allSensorData;

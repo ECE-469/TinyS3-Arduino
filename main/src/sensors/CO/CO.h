@@ -13,9 +13,9 @@ public:
 
   std::string getName() const override;
   std::map<std::string, SensorData> getData() override;
+  void init() override;
 
 private:
-  void init();
   DFRobot_GAS_I2C gas;
 };
 
