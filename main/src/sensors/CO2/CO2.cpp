@@ -61,7 +61,7 @@ void CO2Sensor::safeRead()
   }
   else
   {
-    Serial.println("Data not ready, skipping.");
+    Serial.println("CO2 Data not ready, skipping.");
   }
 }
 

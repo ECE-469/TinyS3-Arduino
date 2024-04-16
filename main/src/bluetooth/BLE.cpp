@@ -14,6 +14,16 @@ std::map<SENSOR_NAME, UUID> sensor_uuid_map = {
     {"NOx", CHARACTERISTIC_NOX_UUID},
     {"Battery", CHARACTERISTIC_BATTERY_PERCENT_UUID}};
 
+void _start_advertising()
+{
+  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+  pAdvertising->addServiceUUID(SERVICE_UUID);
+  pAdvertising->setScanResponse(true);
+  pAdvertising->setMinPreferred(0x06);
+  pAdvertising->setMinPreferred(0x12);
+  BLEDevice::startAdvertising();
+}
+
 void CustomServerCallbacks::onConnect(BLEServer *pServer)
 {
   Serial.println("Client connected");
@@ -21,9 +31,11 @@ void CustomServerCallbacks::onConnect(BLEServer *pServer)
 
 void CustomServerCallbacks::onDisconnect(BLEServer *pServer)
 {
+  BLEDevice::stopAdvertising();
   Serial.println("Client disconnected");
-  delay(100); // give the client time to get the last notification
-  BLEDevice::startAdvertising();
+  delay(800); // give the client time to get the last notification
+  _start_advertising();
+  Serial.println("Advertising started");
 }
 
 BLE::BLE()
@@ -35,7 +47,7 @@ BLE::BLE()
   BLEService *pService = pServer->createService(BLEUUID(SERVICE_UUID), 40);
   _init_characteristics(pService);
   pService->start();
-  _init_advertising();
+  _start_advertising();
 }
 
 BLECharacteristic *BLE::get_characteristic(std::string name)
@@ -58,16 +70,6 @@ void BLE::_init_characteristics(BLEService *pService)
     characteristic_map[sensor_uuid] = characteristic;
     Serial.println("Initialized characteristic for " + String(sensor.c_str()) + " with UUID: " + sensor_uuid.c_str());
   }
-}
-
-void BLE::_init_advertising()
-{
-  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
-  pAdvertising->addServiceUUID(SERVICE_UUID);
-  pAdvertising->setScanResponse(true);
-  pAdvertising->setMinPreferred(0x06);
-  pAdvertising->setMinPreferred(0x12);
-  BLEDevice::startAdvertising();
 }
 
 BLECharacteristic *BLE::create_characteristic(std::string sensor_name, BLEService *pService)
@@ -102,7 +104,7 @@ void BLE::send_data(std::map<std::string, SensorData> data)
     }
     else
     {
-      Serial.println("Sending data for " + String(data.first.c_str()) + ": " + String(data.second.value) + data.second.units.c_str() + " on UUID: " + characteristic->getUUID().toString().c_str());
+      // Serial.println("Sending data for " + String(data.first.c_str()) + ": " + String(data.second.value) + data.second.units.c_str() + " on UUID: " + characteristic->getUUID().toString().c_str());
       characteristic->setValue(bytes, sizeof(bytes));
       characteristic->notify();
       delay(10);

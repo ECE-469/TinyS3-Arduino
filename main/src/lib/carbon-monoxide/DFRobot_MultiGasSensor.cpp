@@ -284,7 +284,7 @@ float DFRobot_GAS::readGasConcentrationPPM(void)
           }else if (((_temp) > 20) && ((_temp) <= 40)){
             Con = (Con / (0.005 * (_temp) + 0.9) - (0.3 * (_temp)-6));
           }else{
-            Con = 0.0;
+            Con = -1.0;
           }
           break;
         case DFRobot_GAS::H2S:
@@ -394,9 +394,10 @@ float DFRobot_GAS::readGasConcentrationPPM(void)
       }
     }
   }else{
-    Con = 0.0;
+    Con = -1.0;
   }
-  if(Con < 0.00001){
+  if (Con < 0.00001 && Con > -0.00001)
+  {
     Con = 0.0;
   }
   return Con;

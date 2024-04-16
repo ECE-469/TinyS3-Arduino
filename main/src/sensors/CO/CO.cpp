@@ -3,7 +3,7 @@
 void COSensor::init()
 {
   gas = DFRobot_GAS_I2C(&Wire, I2C_ADDRESS);
-  delay(250);
+  delay(500);
   if (!gas.begin())
   {
     Serial.println("CO not found!");
@@ -15,7 +15,7 @@ void COSensor::init()
 
   gas.changeAcquireMode(gas.PASSIVITY);
   delay(500);
-  gas.setTempCompensation(gas.ON);
+  gas.setTempCompensation(gas.OFF);
 }
 
 COSensor::COSensor()
@@ -39,6 +39,10 @@ std::map<std::string, SensorData> COSensor::getData()
   else
   {
     Serial.println("CO data not available");
+  }
+  if (data["CO"].value < 0)
+  {
+    Serial.println("CO data not available; bad reading\n\n");
   }
   return data;
 }
