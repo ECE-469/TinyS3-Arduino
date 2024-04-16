@@ -16,10 +16,10 @@ public:
   GasSensor(){};
   ~GasSensor(){};
 
-  // Pure virtual methods to be implemented by derived classes
   virtual std::string getName() const = 0;
   virtual std::map<std::string, SensorData> getData() = 0;
   virtual void init() = 0;
+
   bool isInitialized() const { return initialized; }
 
 protected:
