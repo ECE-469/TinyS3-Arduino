@@ -15,6 +15,8 @@
 using UUID = std::string;
 using SENSOR_NAME = std::string;
 
+void _start_advertising();
+
 extern std::map<SENSOR_NAME, UUID> sensor_uuid_map;
 
 class CustomServerCallbacks : public BLEServerCallbacks
@@ -35,7 +37,6 @@ private:
   std::map<UUID, BLECharacteristic *> characteristic_map;
 
   void _init_characteristics(BLEService *pService);
-  void _init_advertising();
   BLECharacteristic *create_characteristic(std::string sensor_name, BLEService *pService);
 };
 

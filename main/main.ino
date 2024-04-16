@@ -6,10 +6,10 @@
 #include <memory>
 #include <map>
 
-#define BLE_DELAY 2000
-#define SENSOR_DELAY 10000
+#define BLE_DELAY 5000
+#define SENSOR_DELAY 16000
 #define BATTERY_MAX 4.20 // maximum voltage of battery
-#define BATTERY_MIN 3.2  // minimum voltage of battery before shutdown
+#define BATTERY_MIN 3.4  // minimum voltage of battery before shutdown
 
 std::vector<std::unique_ptr<GasSensor>> sensors;
 std::map<std::string, SensorData> allSensorData;
